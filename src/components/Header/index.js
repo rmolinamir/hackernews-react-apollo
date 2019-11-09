@@ -2,10 +2,15 @@
 import React from 'react';
 
 // Components
-import { withRouter } from 'react-router';
+import { withRouter, useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 
+// Dependencies
+import { AUTH_TOKEN } from '../../constants';
+
 export function Header() {
+  const history = useHistory();
+  const authToken = localStorage.getItem(AUTH_TOKEN)
   return (
     <div
       data-test="component-header"
@@ -16,10 +21,31 @@ export function Header() {
         <Link to="/" className="ml1 no-underline black">
           new
         </Link>
-        <div className="ml1">|</div>
-        <Link to="/create" className="ml1 no-underline black">
-          submit
-        </Link>
+        {authToken && (
+          <>
+            <div className="ml1">|</div>
+            <Link to="/create" className="ml1 no-underline black">
+              submit
+            </Link>
+          </>
+        )}
+      </div>
+      <div className="flex flex-fixed">
+        {authToken ? (
+          <div
+            className="ml1 pointer black"
+            onClick={() => {
+              localStorage.removeItem(AUTH_TOKEN)
+              history.push(`/`)
+            }}
+          >
+            logout
+          </div>
+        ) : (
+          <Link to="/login" className="ml1 no-underline black">
+            login
+          </Link>
+        )}
       </div>
     </div>
   );
