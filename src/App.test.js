@@ -6,15 +6,18 @@ import ReactDOM from 'react-dom';
 import { client } from 'configureApolloClient';
 
 // Components
+import { BrowserRouter } from 'react-router-dom';
 import { ApolloProvider } from 'react-apollo';
 import App from './App';
 
 it('renders without crashing', () => {
   const div = document.createElement('div');
   ReactDOM.render(
-    <ApolloProvider client={client}>
-      <App />
-    </ApolloProvider>
+    <BrowserRouter>
+      <ApolloProvider client={client}>
+        <App />
+      </ApolloProvider>
+    </BrowserRouter>
     , div
   );
   ReactDOM.unmountComponentAtNode(div);

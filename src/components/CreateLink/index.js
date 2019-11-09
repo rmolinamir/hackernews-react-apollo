@@ -1,6 +1,7 @@
 // Libraries
 import React from 'react';
 import { useMutation } from '@apollo/react-hooks';
+import { useHistory } from 'react-router';
 
 // Deppendencies
 import queries from 'graphql/queries';
@@ -45,13 +46,11 @@ export default function CreateLink() {
     queries.POST_MUTATION,
     {
       variables: state,
-      onCompleted: () => {
-        dispatch({
-          type: actionTypes.HANDLE_SUBMIT,
-        });
-      },
+      onCompleted: handleOnComplete,
     },
   );
+
+  const history = useHistory();
 
   function handleDescriptionOnChange(event) {
     event.preventDefault();
@@ -67,6 +66,10 @@ export default function CreateLink() {
       type: actionTypes.SET_URL,
       payload: event.target.value,
     });
+  }
+
+  function handleOnComplete() {
+    history.push('/');
   }
 
   return (

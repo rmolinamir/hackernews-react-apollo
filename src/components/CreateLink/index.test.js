@@ -1,8 +1,8 @@
 // Libraries
 import React from 'react';
-import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme';
-import wait from 'waait';
+// import { act } from 'react-dom/test-utils'
+// import wait from 'waait';
 
 // Dependencies
 import { findByTestAttr, Proxy } from 'test/utils';
@@ -10,6 +10,10 @@ import queries from 'graphql/queries';
 
 // Components
 import CreateLink, { initialState, reducer } from '.';
+
+jest.mock("react-router", () => ({
+  useHistory: jest.fn().mockReturnValue({ push() {} }),
+}));
 
 // Original `useReducer` to clean up the mocked useReducer.
 const reactUseReducer = React.useReducer;
@@ -51,6 +55,14 @@ describe('renders', () => {
     wrapper = setup();
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
   it('renders without errors', () => {
     const createLinkComponent = findByTestAttr(wrapper, 'component-create-link');
     expect(createLinkComponent.exists()).toBe(true);
@@ -87,10 +99,14 @@ describe('controlled inputs set states correctly through the dispatcher', () => 
   });
 
   afterEach(() => {
-    // Cleaning up dispatch mock
-    dispatch.mockClear();
-    // Cleaning up `useReducer`
+    // Clearing all mocks under spyOn
+    jest.clearAllMocks();
+    // React.useReducer = reactUseReducer;
     React.useReducer = reactUseReducer;
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 
   it('description-input `onChange` calls dispatch', () => {
@@ -121,26 +137,29 @@ describe('controlled inputs set states correctly through the dispatcher', () => 
     expect(state.url).toBe(mockEvent.target.value);
   });
 
-  it('submit button `onClick` submission clears state', async () => {
-    // Setting up description state
-    const descriptionInput = findByTestAttr(wrapper, 'description-input');
-    let mockEvent = { target: { value : apolloMocks[0].request.variables.description }, preventDefault() {} };
-    descriptionInput.simulate('change', mockEvent);
-    // Setting up url state
-    const urlInput = findByTestAttr(wrapper, 'url-input');
-    mockEvent = { target: { value : apolloMocks[0].request.variables.url }, preventDefault() {} };
-    urlInput.simulate('change', mockEvent);
-    // Expect state to equal object
-    expect(state).toEqual({ description: apolloMocks[0].request.variables.description, url: apolloMocks[0].request.variables.url });
-    // Assertion: state is empty after submit
-    const submitButton = findByTestAttr(wrapper, 'submit-button');
-    await act(async () => {
-      // Submitting button to call the Apollo `useMutation` hook.
-      await submitButton.simulate('click');
-      await wait(0);
-      // Updating wrapper.
-      await wrapper.setProps();
-    });
-    expect(state).toEqual({ description: '', url: '' });
-  });
+  /**
+   * **We're now redirecting to home.**
+   */
+  // it('submit button `onClick` submission clears state', async () => {
+  //   // Setting up description state
+  //   const descriptionInput = findByTestAttr(wrapper, 'description-input');
+  //   let mockEvent = { target: { value : apolloMocks[0].request.variables.description }, preventDefault() {} };
+  //   descriptionInput.simulate('change', mockEvent);
+  //   // Setting up url state
+  //   const urlInput = findByTestAttr(wrapper, 'url-input');
+  //   mockEvent = { target: { value : apolloMocks[0].request.variables.url }, preventDefault() {} };
+  //   urlInput.simulate('change', mockEvent);
+  //   // Expect state to equal object
+  //   expect(state).toEqual({ description: apolloMocks[0].request.variables.description, url: apolloMocks[0].request.variables.url });
+  //   // Assertion: state is empty after submit
+  //   const submitButton = findByTestAttr(wrapper, 'submit-button');
+  //   await act(async () => {
+  //     // Submitting button to call the Apollo `useMutation` hook.
+  //     await submitButton.simulate('click');
+  //     await wait(0);
+  //     // Updating wrapper.
+  //     await wrapper.setProps();
+  //   });
+  //   expect(state).toEqual({ description: '', url: '' });
+  // });
 });
