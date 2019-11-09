@@ -95,7 +95,20 @@ export default function CreateLink() {
       <button
         data-test="submit-button"
         type="button"
-        onClick={createLink}
+        onClick={() => {
+          createLink({
+            // Read the current state of the results of the FEED_QUERY. Then you insert
+            // the newest link at beginning and write the query results back to the store
+            update: (store, { data: { post } }) => {
+              const data = store.readQuery({ query: queries.FEED_QUERY });
+              data.feed.links.unshift(post);
+              store.writeQuery({
+                query: queries.FEED_QUERY,
+                data: data,
+              });
+            }
+          });
+        }}
       >
         Submit
       </button>

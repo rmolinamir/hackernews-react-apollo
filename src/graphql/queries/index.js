@@ -6,9 +6,18 @@ const FEED_QUERY = gql`
     feed {
       links {
         id
-        createdAt
-        url
         description
+        url
+        createdAt
+        votes {
+          id
+          user {
+            id
+          }
+        }
+        postedBy {
+          name
+        }
       }
     }
   }
@@ -40,9 +49,29 @@ const LOGIN_MUTATION = gql`
   }
 `
 
+const VOTE_MUTATION = gql`
+  mutation VoteMutation($linkId: ID!) {
+    vote(linkId: $linkId) {
+      id
+      link {
+        votes {
+          id
+          user {
+            id
+          }
+        }
+      }
+      user {
+        id
+      }
+    }
+  }
+`
+
 export default {
   FEED_QUERY,
   POST_MUTATION,
   SIGNUP_MUTATION,
   LOGIN_MUTATION,
+  VOTE_MUTATION,
 }

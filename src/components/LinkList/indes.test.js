@@ -24,16 +24,36 @@ const apolloMocks = [
         feed: {
           links: [
             {
-              id: 'ck2o7c2luh1ji0b00salddnpd',
-              description: 'Prisma turns your database into a GraphQL API 😎',
-              url: 'https://www.prismagraphql.com',
-              createdAt: '2019-11-07T04:19:15.377Z',
+              "id": "ck2o7c2luh1ji0b00salddnpd",
+              "description": "Prisma turns your database into a GraphQL API 😎",
+              "url": "https://www.prismagraphql.com",
+              "createdAt": "2019-11-07T04:19:15.377Z",
+              "votes": [],
+              "postedBy": null
             },
             {
-              id: 'ck2o7c40zwv5b0b09zpcr0c2u',
-              description: 'The best GraphQL client for React',
-              url: 'https://www.apollographql.com/docs/react/',
-              createdAt: '2019-11-07T04:19:17.219Z',
+              "id": "ck2o7c40zwv5b0b09zpcr0c2u",
+              "description": "The best GraphQL client for React",
+              "url": "https://www.apollographql.com/docs/react/",
+              "createdAt": "2019-11-07T04:19:17.219Z",
+              "votes": [],
+              "postedBy": null
+            },
+            {
+              "id": "ck2pocw1bot240b00aopmmgxh",
+              "description": "Des",
+              "url": "Ur",
+              "createdAt": "2019-11-08T05:03:33.167Z",
+              "votes": [],
+              "postedBy": null
+            },
+            {
+              "id": "ck2qwmhcgsvmi0b00g7p41lp2",
+              "description": "Testing",
+              "url": "http://localhost:3000/create",
+              "createdAt": "2019-11-09T01:42:43.792Z",
+              "votes": [],
+              "postedBy": null
             }
           ],
         },
