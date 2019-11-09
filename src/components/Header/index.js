@@ -21,6 +21,10 @@ export function Header() {
         <Link to="/" className="ml1 no-underline black">
           new
         </Link>
+        <div className="ml1">|</div>
+        <Link to="/search" className="ml1 no-underline black">
+          search
+        </Link>
         {authToken && (
           <>
             <div className="ml1">|</div>
