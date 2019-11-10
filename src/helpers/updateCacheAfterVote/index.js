@@ -11,13 +11,13 @@ import queries from 'graphql/queries';
  * @param {object} voteData - Network response payload from upvote link mutation.
  * @param {number} linkId - Upvoted link id.
  */
-export default function updateCacheAfterVote(store, voteData, linkId) {
+export default function updateCacheAfterVote(store, voteData, linkId, query = queries.FEED_QUERY) {
   // Fetch current cache from the Apollo store
-  const data = store.readQuery({ query: queries.FEED_QUERY });
+  const data = store.readQuery({ query });
   // Find the voted link
   const votedLink = data.feed.links.find(link => link.id === linkId);
   // Overwrite the previous votes with the new ones
   votedLink.votes = voteData.link.votes;
   // Write a new query with the new data including the recent upvoted link
-  store.writeQuery({ query: queries.FEED_QUERY, data });
+  store.writeQuery({ query, data });
 }

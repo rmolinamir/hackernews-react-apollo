@@ -95,7 +95,6 @@ export default function Search() {
           type="button"
           className="ml1"
           onClick={handleOnSubmit}
-          // onClick={loadFilteredLinks}
         >
           search
         </button>
@@ -106,7 +105,7 @@ export default function Search() {
           key={link.id}
           link={link}
           index={index}
-          updateStoreAfterVote={updateCacheAfterVote}
+          updateStoreAfterVote={(...args) =>updateCacheAfterVote(...args, queries.FEED_SEARCH_QUERY)}
         />
       ))}
     </div>
