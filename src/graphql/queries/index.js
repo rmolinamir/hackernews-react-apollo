@@ -16,6 +16,7 @@ const FEED_QUERY = gql`
           }
         }
         postedBy {
+          id
           name
         }
       }
@@ -37,6 +38,7 @@ const POST_MUTATION = gql`
         }
       }
       postedBy {
+        id
         name
       }
     }
