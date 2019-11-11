@@ -10,7 +10,6 @@ import { findByTestAttr, Proxy } from 'test/utils';
 
 // Components
 import Search, { reducer, initialState } from '.';
-import { MockedProvider } from '@apollo/react-testing';
 
 const reactUseReducer = React.useReducer;
 
@@ -40,7 +39,7 @@ describe('renders', () => {
   });
 });
 
-describe('search input element correctly updates state w/ red', () => {
+describe('search input element correctly updates state w/ dispatch', () => {
   let wrapper;
   let state = { ...initialState };
   let dispatch;
@@ -79,11 +78,6 @@ describe('search input element correctly updates state w/ red', () => {
 });
 
 describe('search query works is set up correctly', () => {
-  let wrapper;
-  beforeEach(() => {
-    wrapper = setup();
-  });
-
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -128,6 +122,7 @@ describe('search query works is set up correctly', () => {
             data: {
               feed: {
                 links,
+                count: links.length,
               }
             }
           }
@@ -136,7 +131,7 @@ describe('search query works is set up correctly', () => {
     ];
 
     // Instantiating component
-    wrapper = setup(filterMocks);
+    const wrapper = setup(filterMocks);
 
     // Finding search input and mocking an onChange event to setup state
     const searchInput = findByTestAttr(wrapper, 'search-input');

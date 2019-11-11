@@ -15,15 +15,18 @@ import queries from 'graphql/queries';
  * @param {object} voteData - Network response payload from upvote link mutation.
  * @param {number} linkId - Upvoted link id.
  */
-export default function updateCacheAfterVote(store, voteData, linkId, query = queries.FEED_QUERY) {
+export default function updateCacheAfterVote(store, voteData, linkId, query = queries.FEED_QUERY, variables = {}) {
+  console.log('updateCacheAfterVote variables', variables)
   // Fetch current cache from the Apollo store
-  const data = store.readQuery({ query });
+  const data = store.readQuery({ query, variables });
+  console.log('updateCacheAfterVote data', data)
   // Find the voted link
   const votedLink = data.feed.links.find(link => link.id === linkId);
-  // Overwrite the previous votes with the new ones
   votedLink.votes = voteData.link.votes;
+  // Overwrite the previous votes with the new ones
+  data.feed.links[data.feed.links.indexOf(votedLink)] =  { ...votedLink };
   // Write a new query with the new data including the recent upvoted link
-  store.writeQuery({ query, data });
+  store.writeQuery({ query, variables, data });
 }
 
 export function useUpdateCacheAfterVote() {
@@ -36,16 +39,23 @@ export function useUpdateCacheAfterVote() {
   const skip = isNewPage ? (page - 1) * LINKS_PER_PAGE : 0
   const first = isNewPage ? LINKS_PER_PAGE : 100
   const orderBy = isNewPage ? 'createdAt_DESC' : null
-  const variables = { skip, first, orderBy };
+  const feedQueryVariables = { skip, first, orderBy };
 
-  return (store, voteData, linkId, query = queries.FEED_QUERY) => {
+  const gqlFeedQuery = history.location.pathname.includes('search') ?
+    queries.FEED_QUERY :
+    queries.FEED_SEARCH_QUERY;
+
+  return (store, voteData, linkId, query = gqlFeedQuery, variables = feedQueryVariables) => {
+    console.log('useUpdateCacheAfterVote variables', variables)
+    console.log('useUpdateCacheAfterVote { query, variables }', { query, variables })
     // Fetch current cache from the Apollo store
     const data = store.readQuery({ query, variables });
+    console.log('useUpdateCacheAfterVote data', data)
     // Find the voted link
     const votedLink = data.feed.links.find(link => link.id === linkId);
     // Overwrite the previous votes with the new ones
     votedLink.votes = voteData.link.votes;
     // Write a new query with the new data including the recent upvoted link
-    store.writeQuery({ query, data });
+    store.writeQuery({ query, variables, data });
   }
 }

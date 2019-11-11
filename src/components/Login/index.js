@@ -63,7 +63,7 @@ export default function Login() {
   }
 
   function handleOnComplete(data) {
-    const { token } = login ? data.login : data.singup;
+    const { token } = login ? data.login : data.signup;
     saveUserData(token);
     history.push('/');
   }

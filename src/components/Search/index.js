@@ -25,7 +25,6 @@ export function reducer(state, action) {
     case actionTypes.SET_LINKS:
       return {
         ...state,
-        filter: '',
         links: payload,
       }
     default:
@@ -43,7 +42,7 @@ export default function Search() {
   const [loadFilteredLinks, { loading }] = useLazyQuery(
     queries.FEED_SEARCH_QUERY,
     {
-      onCompleted: data=> {
+      onCompleted: data => {
         const { links } = data.feed;
         dispatch({
           type: actionTypes.SET_LINKS,
@@ -105,7 +104,11 @@ export default function Search() {
           key={link.id}
           link={link}
           index={index}
-          updateStoreAfterVote={(...args) =>updateCacheAfterVote(...args, queries.FEED_SEARCH_QUERY)}
+          updateStoreAfterVote={(...args) => updateCacheAfterVote(
+            ...args,
+            queries.FEED_SEARCH_QUERY,
+            { filter }
+          )}
         />
       ))}
     </div>
