@@ -81,9 +81,9 @@ const FEED_SEARCH_QUERY = gql`
     feed(filter: $filter) {
       links {
         id
+        createdAt
         url
         description
-        createdAt
         postedBy {
           name
         }
@@ -93,6 +93,7 @@ const FEED_SEARCH_QUERY = gql`
           }
         }
       }
+      count
     }
   }
 `

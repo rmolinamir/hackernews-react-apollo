@@ -54,9 +54,10 @@ async function subscribeToNewLinks(subscribeToMore) {
       }
       return Object.assign({}, prev, {
         feed: {
+          ...prev.feed,
           links: newLinks,
           count: newLinks.length,
-          __typename: prev.feed.__typename,
+          // __typename: prev.feed.__typename,
         }
       });
     }

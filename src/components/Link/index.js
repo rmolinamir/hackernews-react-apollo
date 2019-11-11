@@ -36,7 +36,7 @@ export default function Link(props) {
         linkId: id,
       },
     }
-  )
+  );
   return (
     <div
       data-test="component-link"
