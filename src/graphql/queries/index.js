@@ -10,13 +10,11 @@ const FEED_QUERY = gql`
         url
         createdAt
         votes {
-          id
           user {
             id
           }
         }
         postedBy {
-          id
           name
         }
       }
@@ -32,13 +30,11 @@ const POST_MUTATION = gql`
       url
       description
       votes {
-        id
         user {
           id
         }
       }
       postedBy {
-        id
         name
       }
     }
@@ -67,7 +63,6 @@ const VOTE_MUTATION = gql`
       link {
         id
         votes {
-          id
           user {
             id
           }
@@ -89,11 +84,9 @@ const FEED_SEARCH_QUERY = gql`
         description
         createdAt
         postedBy {
-          id
           name
         }
         votes {
-          id
           user {
             id
           }
@@ -111,11 +104,9 @@ const NEW_LINKS_SUBSCRIPTION = gql`
       description
       createdAt
       postedBy {
-        id
         name
       }
       votes {
-        id
         user {
           id
         }
@@ -131,7 +122,6 @@ const NEW_VOTES_SUBSCRIPTION = gql`
       link {
         id
         votes {
-          id
           user {
             id
           }
