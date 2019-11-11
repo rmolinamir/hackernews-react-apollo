@@ -2,22 +2,23 @@
 import gql from "graphql-tag";
 
 const FEED_QUERY = gql`
-  {
-    feed {
+  query FeedQuery($first: Int, $skip: Int, $orderBy: LinkOrderByInput) {
+    feed(first: $first, skip: $skip, orderBy: $orderBy) {
       links {
         id
-        description
-        url
         createdAt
+        url
+        description
+        postedBy {
+          name
+        }
         votes {
           user {
             id
           }
         }
-        postedBy {
-          name
-        }
       }
+      count
     }
   }
 `;

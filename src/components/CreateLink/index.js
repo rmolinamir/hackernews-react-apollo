@@ -4,6 +4,7 @@ import { useMutation } from '@apollo/react-hooks';
 import { useHistory } from 'react-router';
 
 // Deppendencies
+import { LINKS_PER_PAGE } from '../../constants';
 import queries from 'graphql/queries';
 
 const actionTypes = {
@@ -69,7 +70,7 @@ export default function CreateLink() {
   }
 
   function handleOnComplete() {
-    history.push('/');
+    history.push('/new/1');
   }
 
   return (
@@ -100,11 +101,28 @@ export default function CreateLink() {
             // Read the current state of the results of the FEED_QUERY. Then you insert
             // the newest link at beginning and write the query results back to the store
             update: (store, { data: { post } }) => {
-              const data = store.readQuery({ query: queries.FEED_QUERY });
-              data.feed.links.push(post);
+              // Default variables of the first page, that will be used
+              // by Apollo to compare in the memory cache.
+              const variables = {
+                first: LINKS_PER_PAGE,
+                skip: 0,
+                orderBy: 'createdAt_DESC',
+              };
+              const data = store.readQuery({
+                query: queries.FEED_QUERY,
+                variables,
+              });
+              // Place the new post in the first position.
+              data.feed.links.unshift(post);
+              // Removing the last item from the Array if there are more than
+              // LINKS_PER_PAGE links:
+              if (data.feed.links.length > LINKS_PER_PAGE) {
+                data.feed.links.pop();
+              }
               store.writeQuery({
                 query: queries.FEED_QUERY,
                 data: data,
+                variables,
               });
             }
           });

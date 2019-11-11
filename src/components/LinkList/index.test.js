@@ -11,10 +11,29 @@ import { Proxy, findByTestAttr } from 'test/utils';
 // Components
 import LinkList from '.';
 
+jest.mock("react-router", () => ({
+  useHistory: jest.fn().mockReturnValue({
+    push() {},
+    location: {
+      pathname: '/new',
+    },
+  }),
+  useParams: jest.fn().mockReturnValue({
+    page: 1,
+  }),
+}));
+
+const defaultFeedQueryVariables = {
+  first: 10,
+  skip: 0,
+  orderBy: 'createdAt_DESC',
+};
+
 const apolloMocks = [
   {
     request: {
       query: queries.FEED_QUERY,
+      variables: defaultFeedQueryVariables,
     },
     result: {
       data: {
@@ -45,6 +64,7 @@ const apolloMocks = [
               postedBy: null
             },
           ],
+          count: 3,
         },
       },
     },
@@ -91,6 +111,7 @@ const apolloErrorMocks = [
   {
     request: {
       query: queries.FEED_QUERY,
+      variables: defaultFeedQueryVariables,
     },
     error: new Error('Error'),
   },
@@ -147,6 +168,14 @@ describe('renders', () => {
     wrapper = setup();
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
   it('renders without errors', () => {
     const linkComponent = findByTestAttr(wrapper, 'component-link-list');
     expect(linkComponent.exists()).toBe(true);
@@ -175,6 +204,14 @@ describe('error UI', () => {
   let wrapper;
   beforeEach(async () => {
     wrapper = setup(apolloErrorMocks);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 
   it('renders the error UI without errors', async () => {

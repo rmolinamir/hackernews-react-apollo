@@ -1,10 +1,12 @@
 // Libraries
 import React from 'react';
 import { useQuery } from '@apollo/react-hooks';
+import { useHistory, useParams } from 'react-router-dom';
 
 // Dependencies
+import { useUpdateCacheAfterVote } from 'helpers/updateCacheAfterVote';
+import { LINKS_PER_PAGE } from '../../constants';
 import queries from 'graphql/queries';
-import updateCacheAfterVote from 'helpers/updateCacheAfterVote';
 
 // Components
 import Link from 'components/Link';
@@ -44,7 +46,12 @@ async function subscribeToNewLinks(subscribeToMore) {
       const { newLink } = subscriptionData.data;
       const exists = prev.feed.links.find(({ id }) => id === newLink.id);
       if (exists) return prev;
-      const newLinks = [...prev.feed.links, newLink];
+      const newLinks = [newLink, ...prev.feed.links];
+      // Removing the last item from the Array if there are more than
+      // LINKS_PER_PAGE links:
+      if (newLinks.length > LINKS_PER_PAGE) {
+        newLinks.pop();
+      }
       return Object.assign({}, prev, {
         feed: {
           links: newLinks,
@@ -64,8 +71,83 @@ function subscribeToNewVotes(subscribeToMore) {
   return unsubscribe;
 }
 
+/**
+ * The query now accepts arguments that we’ll use to implement pagination and ordering.
+ * skip defines the offset where the query will start. If you passed a value of e.g. 10
+ * for this argument, it means that the first 10 items of the list will not be included in
+ * the response. first then defines the limit, or how many elements, you want to load from
+ * that list. Say, you’re passing the 10 for skip and 5 for first, you’ll receive items 10
+ * to 15 from the list. orderBy defines how the returned list should be sorted.
+ * @function getQueryVariables
+ * @return {object} - Feed query variables.
+ */
+function getQueryVariables(history, params) {
+  const isAtNewPage = history.location.pathname.includes('new');
+  const page = parseInt(params.page, 10);
+
+  const skip = isAtNewPage ? (page - 1) * LINKS_PER_PAGE : 0;
+  const first = isAtNewPage ? LINKS_PER_PAGE : 100;
+  const orderBy = isAtNewPage ? 'createdAt_DESC' : null;
+  return { first, skip, orderBy };
+}
+
+/**
+ * For the newPage, you’ll simply return all the links returned by the query. That’s
+ * logical since here you don’t have to make any manual modifications to the list that
+ * is to be rendered. If the user loaded the component from the /top route, you’ll
+ * sort the list according to the number of votes and return the top 10 links.
+ * @function getLinksToRender
+ * @param {object} data - Apollo feed query data.
+ * @param {object} history - react-router-dom history object.
+ */
+function getLinksToRender(data, history) {
+  const isNewPage = history.location.pathname.includes('new');
+  if (isNewPage) {
+    return data.feed.links;
+  }
+  const rankedLinks = data.feed.links.slice();
+  rankedLinks.sort((l1, l2) => l2.votes.length - l1.votes.length);
+  return rankedLinks;
+}
+
+/**
+ * Functionality for the Next button.
+ * @param {object} data - Apollo feed query data.
+ * @param {object} history - react-router-dom history object.
+ * @param {object} params - react-router-dom params object.
+ */
+function nextPage(data, history, params) {
+  const page = parseInt(params.page, 10)
+  if (page <= data.feed.count / LINKS_PER_PAGE) {
+    const nextPage = page + 1
+    history.push(`/new/${nextPage}`)
+  }
+}
+
+/**
+ * Functionality for the Previou button.
+ * @param {object} data - Apollo feed query data.
+ * @param {object} history - react-router-dom history object.
+ * @param {object} params - react-router-dom params object.
+ */
+function previousPage(history, params) {
+  const page = parseInt(params.page, 10)
+  if (page > 1) {
+    const previousPage = page - 1
+    history.push(`/new/${previousPage}`)
+  }
+}
+
 export default function LinkList() {
-  const { loading, error, data, subscribeToMore } = useQuery(queries.FEED_QUERY);
+  const history = useHistory();
+  const params = useParams();
+  const { loading, error, data, subscribeToMore } = useQuery(
+    queries.FEED_QUERY,
+    {
+      variables: getQueryVariables(history, params)
+    }
+  );
+  const updateCacheAfterVote = useUpdateCacheAfterVote();
 
   React.useEffect(() => {
     const unsubscribeToNewLinks = subscribeToNewLinks(subscribeToMore);
@@ -88,7 +170,12 @@ export default function LinkList() {
     </div>
   );
   
-  const linksToRender = data.feed.links;
+  const linksToRender = getLinksToRender(data, history);
+  const isNewPage = history.location.pathname.includes('new')
+  const pageIndex = params.page
+    ? (params.page - 1) * LINKS_PER_PAGE
+    : 0
+
   return (
     <div data-test="component-link-list">
       {linksToRender.map((link, index) => (
@@ -96,10 +183,20 @@ export default function LinkList() {
           data-test="link"
           key={link.id}
           link={link}
-          index={index}
+          index={index + pageIndex}
           updateStoreAfterVote={updateCacheAfterVote}
         />
       ))}
+      {isNewPage && (
+        <div className="flex ml4 mv3 gray">
+          <div className="pointer mr2" onClick={() => previousPage(history, params)}>
+            Previous
+          </div>
+          <div className="pointer" onClick={() => nextPage(data, history, params)}>
+            Next
+          </div>
+        </div>
+      )}
     </div>
   );
 }

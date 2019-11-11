@@ -18,7 +18,7 @@ import { AUTH_TOKEN } from '../../constants';
 function timeDifferenceForDate(startTime) {
   const now = moment(moment.now());
   const duration = moment.duration(now.diff(moment(startTime)));
-  const hours = duration.asHours();
+  const hours = Math.max(duration.asHours(), 0);
   return hours.toFixed(0);
 }
 
