@@ -30,6 +30,15 @@ const POST_MUTATION = gql`
       createdAt
       url
       description
+      votes {
+        id
+        user {
+          id
+        }
+      }
+      postedBy {
+        name
+      }
     }
   }
 `;
@@ -54,6 +63,7 @@ const VOTE_MUTATION = gql`
     vote(linkId: $linkId) {
       id
       link {
+        id
         votes {
           id
           user {
@@ -91,6 +101,47 @@ const FEED_SEARCH_QUERY = gql`
   }
 `
 
+const NEW_LINKS_SUBSCRIPTION = gql`
+  subscription {
+    newLink {
+      id
+      url
+      description
+      createdAt
+      postedBy {
+        id
+        name
+      }
+      votes {
+        id
+        user {
+          id
+        }
+      }
+    }
+  }
+`
+
+const NEW_VOTES_SUBSCRIPTION = gql`
+  subscription {
+    newVote {
+      id
+      link {
+        id
+        votes {
+          id
+          user {
+            id
+          }
+        }
+      }
+      user {
+        id
+      }
+    }
+  }
+`
+
 export default {
   FEED_QUERY,
   POST_MUTATION,
@@ -98,4 +149,6 @@ export default {
   LOGIN_MUTATION,
   VOTE_MUTATION,
   FEED_SEARCH_QUERY,
+  NEW_LINKS_SUBSCRIPTION,
+  NEW_VOTES_SUBSCRIPTION,
 }

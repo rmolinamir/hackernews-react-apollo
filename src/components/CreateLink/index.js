@@ -101,7 +101,7 @@ export default function CreateLink() {
             // the newest link at beginning and write the query results back to the store
             update: (store, { data: { post } }) => {
               const data = store.readQuery({ query: queries.FEED_QUERY });
-              data.feed.links.unshift(post);
+              data.feed.links.push(post);
               store.writeQuery({
                 query: queries.FEED_QUERY,
                 data: data,
